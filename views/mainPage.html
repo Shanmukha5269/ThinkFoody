@@ -3,9 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Foodie - Recipe Explorer</title>
+    <link rel="stylesheet" href="/styles/mainPage.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>This is main page</h1>
+    <header>
+        <div class="logo">Foodie</div>
+        <!-- <nav>
+            <ul>
+            </ul>
+        </nav> -->
+        <div class="nav-right">
+            <div class="kitchen-option">
+                <a href="#" class="kitchen-btn"><i class="fas fa-utensils"></i> <span>My Kitchen</span> <span class="kitchen-count">0</span></a>
+            </div>
+            <div class="profile-option">
+                <a href="#" class="profile-btn"><i class="fas fa-user-circle"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero-section">
+            <div class="hero-content">
+                <h1>Discover Delicious Recipes</h1>
+                <p>Find your next favorite meal from our collection of tasty recipes</p>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" placeholder="Find for recipe">
+                    <button class="search-button"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="search-recommendations">
+                    <button class="recommendation-btn">Pasta</button>
+                    <button class="recommendation-btn">Chicken</button>
+                    <button class="recommendation-btn">Vegetarian</button>
+                    <button class="recommendation-btn">Desserts</button>
+                    <button class="recommendation-btn">Quick Meals</button>
+                    <button class="recommendation-btn">Healthy</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2023 Foodie Recipes. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/scripts/mainPage.js"></script>
 </body>
 </html>

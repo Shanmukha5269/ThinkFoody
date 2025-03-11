@@ -14,25 +14,32 @@ header {
     top: 0;
     left: 0;
     right: 0;
-    background: #333;
+    background: rgba(51, 51, 51, 0.95);
     color: #fff;
-    padding: 10px 0;
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .logo {
     margin-left: 20px;
     font-size: 24px;
     font-weight: bold;
+    color: #ff9800;
+}
+
+nav {
+    display: flex;
 }
 
 nav ul {
     list-style: none;
     display: flex;
     margin-right: 20px;
+    padding: 0;
 }
 
 nav ul li {
@@ -42,6 +49,152 @@ nav ul li {
 nav ul li a {
     color: #fff;
     text-decoration: none;
+    padding: 5px 0;
+    position: relative;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #ff9800;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.kitchen-option {
+    margin-right: 20px;
+}
+
+.kitchen-btn {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.kitchen-btn i {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.kitchen-count {
+    background-color: #ff9800;
+    color: white;
+    font-size: 12px;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    transition: transform 0.3s ease;
+}
+
+.kitchen-count-animate {
+    animation: pulse 0.3s ease;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.kitchen-btn:hover {
+    color: #ff9800;
+}
+
+.profile-btn {
+    color: #fff;
+    font-size: 24px;
+    transition: color 0.3s;
+}
+
+.profile-btn:hover {
+    color: #ff9800;
+}
+
+.search-container {
+    position: absolute;
+    bottom: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+.search-wrapper {
+    width: 100%;
+    display: flex;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.search-input {
+    flex: 1;
+    padding: 15px 25px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+.search-input::placeholder {
+    color: #777;
+    font-style: italic;
+}
+
+.search-button {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 0 25px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #e68900;
+}
+
+.search-recommendations {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    animation: fadeInUp 1s ease-out forwards 0.5s;
+    opacity: 0;
+}
+
+.recommendation-btn {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-btn:hover {
+    background-color: #ff9800;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
 }
 
 .signin-button {
@@ -503,5 +656,114 @@ footer {
     .footer-links {
         flex-direction: column;
         gap: 20px;
+    }
+}
+
+/* Responsive styles for navigation */
+@media screen and (max-width: 768px) {
+    header {
+        padding: 10px 15px;
+    }
+
+    .logo {
+        font-size: 22px;
+        margin-left: 10px;
+    }
+
+    nav ul {
+        margin-right: 10px;
+    }
+
+    nav ul li {
+        margin: 0 8px;
+    }
+
+    nav ul li a {
+        font-size: 14px;
+    }
+
+    .signin-button {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .kitchen-btn span:not(.kitchen-count) {
+        display: none;
+    }
+
+    .search-container {
+        bottom: 20%;
+        width: 95%;
+    }
+
+    .search-input {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+
+    .search-button {
+        padding: 0 15px;
+    }
+
+    .recommendation-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    header {
+        flex-wrap: wrap;
+        padding: 10px;
+    }
+
+    .logo {
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: center;
+    }
+
+    nav {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+
+    nav ul {
+        width: 100%;
+        justify-content: center;
+        margin-right: 0;
+    }
+
+    nav ul li {
+        margin: 0 5px;
+    }
+
+    nav ul li a {
+        font-size: 13px;
+    }
+
+    .signin-button {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+
+    .nav-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .home-title {
+        font-size: 32px;
+        padding: 15px 20px;
+    }
+
+    .bake-button {
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    .search-recommendations {
+        gap: 6px;
     }
 }
