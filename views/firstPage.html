@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="/styles/firstPage.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -22,54 +23,145 @@
     </header>
 
     <section id="home" class="home-section">
-        <!-- <div class="image-container">
-            <img src="https://source.unsplash.com/random/150x150?nature" class="image img1">
-            <img src="https://source.unsplash.com/random/150x150?technology" class="image img2">
-            <img src="https://source.unsplash.com/random/150x150?abstract" class="image img3">
-            <img src="https://source.unsplash.com/random/150x150?space" class="image img4">
-        </div> -->
-        <h1>Welcome to Foodie Recipes</h1>
+        <div class="food-images">
+            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800" alt="Food image" class="food-image top">
+            <img src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=800" alt="Food image" class="food-image left">
+            <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=800" alt="Food image" class="food-image right">
+            <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800" alt="Food image" class="food-image bottom">
+        </div>
+        <h1 class="home-title">Welcome to Foodie Recipes</h1>
     </section>
 
     <section id="services">
-        <h2>Our Delicious Recipes</h2>
+        <h2>Our Popular Recipes</h2>
         <div class="card-container">
             <div class="card">
-                <img src="https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Recipe 1">
+                <div class="card-image-container">
+                    <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800" alt="Pasta dish">
+                    <div class="recipe-tag">Italian</div>
+                </div>
                 <div class="card-content">
-                    <h3>Spaghetti Carbonara</h3>
-                    <p>Delicious and easy to make.</p>
+                    <h3>Creamy Garlic Parmesan Pasta</h3>
+                    <p class="recipe-desc">A rich, creamy pasta dish with garlic, butter and freshly grated parmesan cheese.</p>
+                    <div class="recipe-meta">
+                        <span><i class="fas fa-clock"></i> 25 mins</span>
+                        <span><i class="fas fa-fire"></i> 450 cal</span>
+                    </div>
+                    <a href="#" class="recipe-button">View Recipe</a>
                 </div>
             </div>
+            
             <div class="card">
-                <img src="https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Recipe 2">
+                <div class="card-image-container">
+                    <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800" alt="Chicken dish">
+                    <div class="recipe-tag">Asian</div>
+                </div>
                 <div class="card-content">
-                    <h3>Grilled Chicken Salad</h3>
-                    <p>Perfect for dinner parties.</p>
+                    <h3>Teriyaki Glazed Salmon</h3>
+                    <p class="recipe-desc">Tender salmon fillets covered in a homemade sweet and savory teriyaki sauce.</p>
+                    <div class="recipe-meta">
+                        <span><i class="fas fa-clock"></i> 30 mins</span>
+                        <span><i class="fas fa-fire"></i> 380 cal</span>
+                    </div>
+                    <a href="#" class="recipe-button">View Recipe</a>
                 </div>
             </div>
+            
             <div class="card">
-                <img src="https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Recipe 3">
+                <div class="card-image-container">
+                    <img src="https://media.istockphoto.com/id/588595864/photo/steaming-mixed-vegetables-in-the-wok-asian-style-cooking.jpg?s=1024x1024&w=is&k=20&c=zH5xP4FinKrvXMYDjFRlVZ5p3lX4F3VjccnajKw9lxw=">
+                    <div class="recipe-tag">Vegetarian</div>
+                </div>
                 <div class="card-content">
-                    <h3>Vegetable Stir Fry</h3>
-                    <p>Healthy and nutritious.</p>
+                    <h3>Mediterranean Quinoa Bowl</h3>
+                    <p class="recipe-desc">Nutritious quinoa bowl with roasted vegetables, feta cheese, and tahini dressing.</p>
+                    <div class="recipe-meta">
+                        <span><i class="fas fa-clock"></i> 40 mins</span>
+                        <span><i class="fas fa-fire"></i> 320 cal</span>
+                    </div>
+                    <a href="#" class="recipe-button">View Recipe</a>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="keypoints">
-        <h2>Key Points About Our Website</h2>
-        <ul>
-            <li>Easy to follow recipes</li>
-            <li>Wide variety of cuisines</li>
-            <li>Healthy options available</li>
-            <li>Step-by-step instructions</li>
-        </ul>
+        <h2>Why Choose Our Recipes</h2>
+        
+        <div class="keypoints-container">
+            <div class="keypoint-item">
+                <div class="keypoint-icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <h3>Easy Measurements</h3>
+                <p>Precise measurements and conversions provided for all ingredients, making it simple to follow recipes with cups, grams, or ounces.</p>
+            </div>
+            <div class="keypoint-item">
+                <div class="keypoint-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3>Easy to Follow</h3>
+                <p>Step-by-step instructions that make cooking simple for beginners and experts alike.</p>
+            </div>
+            <div class="keypoint-item">
+                <div class="keypoint-icon">
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <h3>Global Cuisines</h3>
+                <p>Explore dishes from Italian, Mexican, Indian, Japanese, and many more international cuisines.</p>
+            </div>
+ 
+            <div class="keypoint-item">
+                <div class="keypoint-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Time-Saving</h3>
+                <p>Quick recipes for busy weeknights and meal prep ideas to save you time in the kitchen.</p>
+            </div>
+        </div>
     </section>
 
     <footer>
-        <p>&copy; 2023 Foodie Recipes. All rights reserved.</p>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>Foodie</h3>
+                <p>Delicious recipes for every taste</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Recipes</a></li>
+                        <li><a href="#keypoints">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="#">Breakfast</a></li>
+                        <li><a href="#">Lunch</a></li>
+                        <li><a href="#">Dinner</a></li>
+                        <li><a href="#">Desserts</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-pinterest"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Foodie Recipes. All rights reserved.</p>
+        </div>
     </footer>
+
+    <script src="/scripts/firstpage.js"></script>
 </body>
 </html>
