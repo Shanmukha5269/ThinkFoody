@@ -58,14 +58,14 @@ nav ul li a {
 
 .home-section {
     height: 100vh;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://img.freepik.com/free-photo/top-view-flour-with-baking-tools-table_23-2148461115.jpg?t=st=1741690288~exp=1741693888~hmac=483835e447cadf2d0dec37961f84a9135a8fdb5f0e326697605358c748efaef8&w=2000') no-repeat center center/cover;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://img.freepik.com/free-photo/top-view-flour-with-baking-tools-table_23-2148461115.jpg?t=st=1741690288~exp=1741693888~hmac=483835e447cadf2d0dec37961f84a9135a8fdb5f0e326697605358c748efaef8&w=2000') no-repeat center center/cover;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
     text-align: center;
     position: relative;
-    overflow: hidden; /* Prevent overflow of images */
+    overflow: hidden;
 }
 
 .home-content {
@@ -74,19 +74,20 @@ nav ul li a {
     align-items: center;
     justify-content: center;
     z-index: 10;
+    max-width: 90%;
+    animation: fadeInContent 1s ease forwards;
 }
 
 .home-title {
     font-size: 48px;
-    opacity: 0; /* Start hidden */
-    animation: fadeIn 1.5s forwards 2s; /* Fade in effect after images have animated */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     position: relative;
     background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
     padding: 20px 30px;
     border-radius: 10px;
-    max-width: 80%;
+    max-width: 100%;
     margin-bottom: 30px;
+    animation: fadeInUp 1s ease-out forwards;
 }
 
 .bake-button {
@@ -100,9 +101,7 @@ nav ul li a {
     text-decoration: none;
     box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
     transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 1s forwards 2.5s;
+    animation: fadeInUp 1s ease-out forwards 0.3s;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -123,113 +122,23 @@ nav ul li a {
     transform: translateX(5px);
 }
 
-.food-images {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    z-index: 5;
-    pointer-events: none; /* Allow clicking through images */
-}
-
-.food-image {
-    width: 150px; /* Slightly smaller images */
-    height: 150px;
-    border-radius: 10px;
-    opacity: 0; /* Start hidden */
-    position: absolute;
-    object-fit: cover;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    border: 3px solid white;
-}
-
-.food-image.top {
-    top: -190px;
-    animation: slideInFromTop 1.2s forwards 0.2s;
-}
-
-.food-image.bottom {
-    bottom: -190px;
-    animation: slideInFromBottom 1.2s forwards 0.4s;
-}
-
-.food-image.left {
-    left: -190px;
-    animation: slideInFromLeft 1.2s forwards 0.6s;
-}
-
-.food-image.right {
-    right: -190px;
-    animation: slideInFromRight 1.2s forwards 0.8s;
-}
-
-@keyframes slideInFromTop {
-    0% {
-        transform: translateY(-100vh) rotate(-10deg);
+@keyframes fadeInUp {
+    from {
         opacity: 0;
+        transform: translateY(20px);
     }
-    70% {
+    to {
         opacity: 1;
-    }
-    100% {
-        transform: translateY(15vh) translateX(-40%) rotate(0deg);
-        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-@keyframes slideInFromBottom {
-    0% {
-        transform: translateY(100vh) rotate(10deg);
+@keyframes fadeInContent {
+    from {
         opacity: 0;
+        transform: scale(0.95);
     }
-    70% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-15vh) translateX(40%) rotate(0deg);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInFromLeft {
-    0% {
-        transform: translateX(-100vw) rotate(-10deg);
-        opacity: 0;
-    }
-    70% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateX(15vw) translateY(-40%) rotate(0deg);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInFromRight {
-    0% {
-        transform: translateX(100vw) rotate(10deg);
-        opacity: 0;
-    }
-    70% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateX(-15vw) translateY(40%) rotate(0deg);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    100% {
+    to {
         opacity: 1;
         transform: scale(1);
     }
@@ -458,14 +367,14 @@ nav ul li a {
     animation: fadeInUp 0.5s forwards 0.4s;
 }
 
-@keyframes fadeInUp {
-    from {
+@keyframes fadeIn {
+    0% {
         opacity: 0;
-        transform: translateY(20px);
+        transform: scale(0.9);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1);
     }
 }
 
