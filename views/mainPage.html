@@ -11,10 +11,12 @@
 <body>
     <header>
         <div class="logo">Foodie</div>
-        <!-- <nav>
+        <nav>
             <ul>
+
+
             </ul>
-        </nav> -->
+        </nav>
         <div class="nav-right">
             <div class="kitchen-option">
                 <a href="#" class="kitchen-btn"><i class="fas fa-utensils"></i> <span>My Kitchen</span> <span class="kitchen-count">0</span></a>
@@ -34,8 +36,8 @@
             
             <div class="search-container">
                 <div class="search-wrapper">
-                    <input type="text" class="search-input" placeholder="Find for recipe">
-                    <button class="search-button"><i class="fas fa-search"></i></button>
+                    <input type="text" id="search-input" class="search-input" placeholder="Find for recipe">
+                    <button id="search-button" onclick="searchRecipe()" class="search-button"><i class="fas fa-search"></i></button>
                 </div>
                 <div class="search-recommendations">
                     <button class="recommendation-btn">Pasta</button>
@@ -46,6 +48,11 @@
                     <button class="recommendation-btn">Healthy</button>
                 </div>
             </div>
+        </section>
+        
+        <!-- Search Results Section -->
+        <section id="search-results" class="search-results-section">
+            <!-- Results will be dynamically added here by JavaScript -->
         </section>
     </main>
 
