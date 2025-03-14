@@ -27,49 +27,84 @@ db.serialize(() => {
   `);
 });
 
-// Conversion factors for non-liquid items to grams (approximate)
+// Conversion factors to grams (approximate)
 const conversionFactors = {
-  cups: 240,
+  cups: 240,        // General approximation; can be refined per ingredient
   tablespoons: 15,
   teaspoons: 5,
   ounces: 28.35,
+  milliliters: 1,   // Assuming density ~1g/mL (water-like)
+  ml: 1,
+  pounds: 453.59,
+  grams: 1,         // No conversion needed
 };
 
-// List of liquid items to keep in original units
-const liquidItems = [
-  'oil', 'water', 'sauce', 'milk', 'soy sauce', 'sesame oil', 'broth', 'juice', 'vinegar', 'honey', 'syrup'
-];
+// Approximate quantities for ambiguous measurements (in grams)
+const approximateQuantities = {
+  pinch: 0.5,       // Common for spices
+  dash: 0.3,        // Common for spices or liquids
+  handful: 30,      // Rough estimate for herbs or small items
+  sprig: 2,         // Common for herbs like thyme or rosemary
+};
 
 // Function to parse Gemini API text response into ingredients
 const parseIngredientsFromText = (text) => {
   console.log('Raw API text response:', text);
-  const lines = text.split('\n').filter(line => line.trim() && line.includes('*'));
+  const lines = text.split('\n').filter(line => line.trim() && line.includes('*')); // Assuming ingredients are bullet points
   const ingredients = [];
 
-  lines.forEach(line => {
-    const match = line.match(/(\d+\.?\d*|\d+\/\d+)\s*(cups?|tablespoons?|teaspoons?|ounces?|milliliters?|ml)\s*([A-Za-z\s]+)/i);
+  lines.forEach((line) => {
+    // Enhanced regex to capture quantity, unit, and name
+    const match = line.match(/(\d+\.?\d*|\d+\/\d+|\d+)\s*(cups?|tablespoons?|teaspoons?|ounces?|milliliters?|ml|pounds?|grams?)\s*([A-Za-z\s]+)/i);
+    let name, quantity, unit;
+
     if (match) {
-      let [, quantity, unit, name] = match;
+      // Case 1: Quantity and unit are provided
+      [, quantity, unit, name] = match;
+      // Handle fractions like "1/2"
       quantity = quantity.includes('/') ? eval(quantity) : parseFloat(quantity);
-      name = name.trim().toLowerCase().replace(/\(.*\)/, '');
+      name = name.trim().toLowerCase().replace(/\(.*\)/, ''); // Clean up name
       unit = unit.toLowerCase();
 
-      const isLiquid = liquidItems.some(liquid => name.includes(liquid));
-      
-      if (isLiquid) {
-        ingredients.push({
-          name: name,
-          quantity: quantity.toFixed(1),
-          unit: unit,
-        });
-      } else {
-        const factor = conversionFactors[unit] || 1;
-        const grams = quantity * factor;
+      // Convert to grams
+      const factor = conversionFactors[unit] || 1; // Default to 1 if unit unrecognized
+      const grams = quantity * factor;
+
+      // Round appropriately: whole numbers for >10g, 1 decimal for smaller amounts
+      const roundedGrams = grams >= 10 ? Math.round(grams) : grams.toFixed(1);
+
+      ingredients.push({
+        name: name,
+        quantity: roundedGrams.toString(),
+        unit: 'grams',
+      });
+    } else {
+      // Case 2: No clear quantity/unit, check for approximate measurements
+      const approxMatch = line.match(/(pinch|dash|handful|sprig)\s*(?:of\s*)?([A-Za-z\s]+)/i);
+      if (approxMatch) {
+        const [, approxUnit, approxName] = approxMatch;
+        name = approxName.trim().toLowerCase();
+        const grams = approximateQuantities[approxUnit.toLowerCase()] || 0.5; // Default to 0.5g if unrecognized
+
         ingredients.push({
           name: name,
           quantity: grams.toFixed(1),
           unit: 'grams',
         });
+      } else {
+        // Case 3: Fallback for completely unparseable lines
+        const fallbackMatch = line.match(/\*\s*(.+)/);
+        if (fallbackMatch) {
+          name = fallbackMatch[1].trim().toLowerCase();
+          ingredients.push({
+            name: name,
+            quantity: '1.0', // Default to 1 gram for unknown quantities
+            unit: 'grams',
+            note: 'Approximated quantity due to unclear input',
+          });
+        } else {
+          console.warn(`Line not parsed: "${line}"`);
+        }
       }
     }
   });
@@ -78,7 +113,7 @@ const parseIngredientsFromText = (text) => {
   return ingredients.length > 0 ? ingredients : null;
 };
 
-// Search endpoint (moved to router)
+// Search endpoint
 router.post('/search', async (req, res) => {
   const { recipeName } = req.body;
 
@@ -90,6 +125,7 @@ router.post('/search', async (req, res) => {
   }
 
   try {
+    // Check if recipe exists in the database
     const row = await new Promise((resolve, reject) => {
       db.get('SELECT ingredients FROM recipes WHERE name = ?', [recipeName], (err, row) => {
         if (err) reject(err);
@@ -106,7 +142,8 @@ router.post('/search', async (req, res) => {
 
     console.log(`${recipeName} not in database, fetching from Gemini API`);
 
-    const prompt = `List the ingredients for a ${recipeName} recipe with quantities and units (e.g., "2 cups of flour", "1 tablespoon of oil").`;
+    // Prepare prompt for Gemini API
+    const prompt = `List the ingredients for a ${recipeName} recipe with quantities and units (e.g., "2 cups of flour", "1 tablespoon of oil"). Use bullet points with '*' for each ingredient.`;
     const response = await axios.post(
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
       {
@@ -132,6 +169,7 @@ router.post('/search', async (req, res) => {
       throw new Error('Could not parse ingredients from API response');
     }
 
+    // Save to database
     const ingredientsJson = JSON.stringify(ingredients);
     await new Promise((resolve, reject) => {
       db.run(
@@ -153,10 +191,11 @@ router.post('/search', async (req, res) => {
       console.error('API error data:', JSON.stringify(error.response.data, null, 2));
     }
 
+    // Fallback mock data
     const mockIngredients = [
-      { name: 'flour', quantity: '480.0', unit: 'grams' },
-      { name: 'cheese', quantity: '240.0', unit: 'grams' },
-      { name: 'oil', quantity: '3.0', unit: 'tablespoons' },
+      { name: 'flour', quantity: '480', unit: 'grams' },
+      { name: 'cheese', quantity: '240', unit: 'grams' },
+      { name: 'oil', quantity: '45', unit: 'grams' }, // 3 tbsp converted
     ];
     console.log('Falling back to mock data due to error');
 
@@ -174,36 +213,6 @@ router.post('/search', async (req, res) => {
 
     res.status(200).json({ ingredients: mockIngredients, note: 'API failed, using mock data' });
   }
-});
-
-// Other router endpoints
-router.get('/search', (req, res) => {
-  const query = req.query.q;
-  if (!query) {
-    return res.status(400).json({ success: false, message: 'Search query is required', results: [] });
-  }
-  const results = searchRecipes(query);
-  console.log(`Searching for "${query}" - Found ${results.length} results`);
-  res.json({ success: true, query, count: results.length, results });
-});
-
-router.get('/recipes', (req, res) => {
-  res.json({ success: true, count: sampleRecipes.length, results: sampleRecipes });
-});
-
-router.get('/recipes/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const recipe = sampleRecipes.find(r => r.id === id);
-  if (!recipe) {
-    return res.status(404).json({ success: false, message: 'Recipe not found' });
-  }
-  res.json({ success: true, recipe });
-});
-
-// Error handling middleware (optional, can be moved to server.js if preferred)
-router.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
 });
 
 // Close database on process exit
