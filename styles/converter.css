@@ -64,40 +64,6 @@ nav ul li {
     align-items: center;
 }
 
-.kitchen-option {
-    margin-right: 20px;
-}
-
-.kitchen-btn {
-    display: flex;
-    align-items: center;
-    color: #fff;
-    text-decoration: none;
-    font-size: 16px;
-    transition: color 0.3s ease;
-}
-
-.kitchen-btn i {
-    font-size: 18px;
-    margin-right: 5px;
-}
-
-.kitchen-count {
-    background-color: #ff9800;
-    color: white;
-    font-size: 12px;
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 5px;
-}
-
-.kitchen-btn:hover {
-    color: #ff9800;
-}
 
 .profile-btn {
     color: #fff;
