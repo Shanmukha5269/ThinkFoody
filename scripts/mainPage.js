@@ -31,20 +31,6 @@ if (searchInput) {
     });
 }
 
-// Kitchen counter functionality
-const kitchenBtn = document.querySelector('.kitchen-btn');
-const kitchenCount = document.querySelector('.kitchen-count');
-let count = 0;
-
-function addToKitchen() {
-    count++;
-    kitchenCount.textContent = count;
-    kitchenCount.classList.add('kitchen-count-animate');
-    setTimeout(() => {
-        kitchenCount.classList.remove('kitchen-count-animate');
-    }, 300);
-}
-
 // Search functionality
 const searchButton = document.querySelector('.search-button');
 if (searchButton) {
@@ -91,8 +77,8 @@ function searchRecipe() {
         }
     }, 8000);
 
-    // POST request to /api/search
-    fetch('http://localhost:3000/api/search', {
+    // First attempt: POST request to /api/search
+    fetch('/api/search', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -119,8 +105,8 @@ function searchRecipe() {
     .catch(error => {
         console.error('POST attempt failed:', error);
         
-        // Fallback GET request to /api/search
-        fetch(`http://localhost:3000/api/search?q=${encodeURIComponent(searchValue)}`, {
+        // Second attempt: GET request to /api/search
+        fetch(`/api/search?q=${encodeURIComponent(searchValue)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
@@ -197,30 +183,13 @@ function displaySearchResults(data, searchQuery) {
     resultsHTML += '</div>';
     resultsHTML += `
         <div class="action-buttons">
-            <button class="try-cooking-btn">Add to Kitchen</button>
             <button class="new-search-btn">New Search</button>
         </div>
     `;
 
     resultsContainer.innerHTML = resultsHTML;
 
-    // Event listeners for buttons
-    const tryCookingBtn = resultsContainer.querySelector('.try-cooking-btn');
-    if (tryCookingBtn) {
-        tryCookingBtn.addEventListener('click', function() {
-            const kitchenCount = document.querySelector('.kitchen-count');
-            if (kitchenCount) {
-                const currentCount = parseInt(kitchenCount.textContent) || 0;
-                kitchenCount.textContent = currentCount + 1;
-                kitchenCount.classList.add('kitchen-count-animate');
-                setTimeout(() => {
-                    kitchenCount.classList.remove('kitchen-count-animate');
-                }, 300);
-            }
-            alert(`Added ${searchQuery} to your kitchen!`);
-        });
-    }
-
+    // Event listener for new search button
     const newSearchBtn = resultsContainer.querySelector('.new-search-btn');
     if (newSearchBtn) {
         newSearchBtn.addEventListener('click', function() {
