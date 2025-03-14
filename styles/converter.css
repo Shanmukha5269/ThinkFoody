@@ -74,7 +74,7 @@ nav ul li {
     color: #fff;
     text-decoration: none;
     font-size: 16px;
-    transition: color 0.3s;
+    transition: color 0.3s ease;
 }
 
 .kitchen-btn i {
@@ -102,7 +102,7 @@ nav ul li {
 .profile-btn {
     color: #fff;
     font-size: 24px;
-    transition: color 0.3s;
+    transition: color 0.3s ease;
 }
 
 .profile-btn:hover {
