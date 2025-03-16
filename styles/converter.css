@@ -238,7 +238,42 @@ nav ul li {
 }
 
 .gram-results {
-    padding: 10px;
+    padding: 20px;
+    min-height: 100px;
+}
+
+.gram-results table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.gram-results table th,
+.gram-results table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.gram-results table th {
+    background-color: #ff9800;
+    color: white;
+    font-weight: bold;
+}
+
+.gram-results table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.gram-results table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.no-results {
+    color: #757575;
+    text-align: center;
+    font-style: italic;
+    padding: 20px;
 }
 
 .form-select {
