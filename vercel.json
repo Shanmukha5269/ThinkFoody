@@ -1,7 +1,7 @@
 {
     "rewrites" :[
         {
-            "source" : "./server.js" ,
+            "source" : "./views/firstPage.html" ,
             "destination" : "/"
         }
     ]
