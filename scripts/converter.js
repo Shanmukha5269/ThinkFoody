@@ -2,21 +2,23 @@
 const baseConversionRates = {
     'tablespoon': 14.787,
     'teaspoon': 4.929,
-    'cup': 236.588
+    'cup': 236.588,
+    'ounce': 28.35 
 };
 
 // Density multipliers relative to water (water = 1.0)
 const ingredientDensities = {
-    'water': 1.0,      // Reference density
-    'milk': 1.03,      // Slightly denser than water
-    'flour': 0.53,     // About half as dense as water
-    'sugar': 0.85,     // White granulated sugar
-    'butter': 0.96,    // Slightly less dense than water
-    'honey': 1.42,     // Much denser than water
-    'oil': 0.92,       // Less dense than water
-    'salt': 1.22,      // Denser than water
-    'chocolate': 0.64, // Chocolate chips/chunks
-    'rice': 0.87       // Uncooked rice
+    'water': 1.0,  
+    'milk': 1.03,     
+    'flour': 0.53, 
+    'sugar': 0.85,     
+    'butter': 0.96,    
+    'honey': 1.42,    
+    'oil': 0.92,   
+    'salt': 1.22,      
+    'chocolate': 0.64,
+    'rice': 0.87,          
+    'tomato': 0.47 
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -78,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Function to initialize dropdown search functionality
     function initializeDropdownSearch() {
         const searchInputs = document.querySelectorAll('.dropdown-search');
         
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let hasVisibleOptions = false;
                 
                 options.forEach(option => {
-                    // Skip the first placeholder option
+        
                     if (option.value === '') return;
                     
                     const text = option.textContent.toLowerCase();

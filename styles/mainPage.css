@@ -1,4 +1,4 @@
-/* Main Page Styles */
+
 
 * {
     box-sizing: border-box;
@@ -13,7 +13,7 @@ body {
     background-color: #f8f8f8;
 }
 
-/* Header & Navigation */
+
 header {
     position: fixed;
     top: 0;
@@ -97,7 +97,7 @@ nav ul li a:hover::after {
     color: #ff9800;
 }
 
-/* Search Section */
+
 .search-section {
     height: 70vh;
     background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://img.freepik.com/free-photo/top-view-flour-with-baking-tools-table_23-2148461115.jpg?t=st=1741690288~exp=1741693888~hmac=483835e447cadf2d0dec37961f84a9135a8fdb5f0e326697605358c748efaef8&w=2000') no-repeat center center/cover;
@@ -129,7 +129,7 @@ nav ul li a:hover::after {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* Search Container */
+
 .search-container {
     width: 90%;
     max-width: 800px;
@@ -204,16 +204,16 @@ nav ul li a:hover::after {
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
 }
 
-/* Footer */
+
 footer {
     background-color: #333;
     color: white;
     text-align: center;
     padding: 20px;
-    margin-top: 0; /* Adjusted to work better with converter section */
+    margin-top: 0; 
 }
 
-/* Animations */
+
 @keyframes fadeInDown {
     from {
         opacity: 0;
@@ -236,7 +236,7 @@ footer {
     }
 }
 
-/* Responsive Styles */
+
 @media screen and (max-width: 768px) {
     header {
         padding: 10px 15px;
@@ -291,7 +291,7 @@ footer {
     }
 }
 
-/* Search Results Section */
+
 .search-results-section {
     width: 90%;
     max-width: 1200px;
@@ -310,7 +310,7 @@ footer {
     padding-bottom: 10px;
 }
 
-/* Error container */
+
 .error-container {
     text-align: center;
     padding: 20px;
@@ -332,7 +332,7 @@ footer {
     font-size: 14px;
 }
 
-/* Ingredients container styles */
+
 .ingredients-container {
     margin-bottom: 20px;
 }
@@ -370,7 +370,6 @@ footer {
     font-weight: 500;
 }
 
-/* Action buttons */
 .action-buttons {
     display: flex;
     justify-content: center;
@@ -408,7 +407,7 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Legacy styles kept for compatibility */
+
 .results-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -506,7 +505,6 @@ footer {
     background-color: #f57c00;
 }
 
-/* Responsive styles for search results */
 @media (max-width: 768px) {
     .results-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -523,7 +521,7 @@ footer {
     }
 }
 
-/* Unit Converter Section */
+
 .converter-section {
     width: 100%;
     display: flex;
@@ -564,7 +562,7 @@ footer {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive styles for converter button */
+
 @media screen and (max-width: 576px) {
     .converter-btn {
         padding: 10px 20px;
@@ -576,7 +574,7 @@ footer {
     }
 }
 
-/* Navigation styles */
+
 .home-link {
     color: #fff;
     font-size: 20px;
