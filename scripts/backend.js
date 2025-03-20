@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 const express = require('express');
 const dotenv = require('dotenv');
 const axios = require('axios');
@@ -280,17 +273,96 @@ router.post('/search', async (req, res) => {
   }
 });
 
-// New endpoint to get density data
-router.get('/density', (req, res) => {
-  db.all("SELECT * FROM ingredient_density", (err, rows) => {
-    if (err) {
-      console.error('Error fetching density data:', err.message);
-      res.status(500).json({ error: 'Failed to fetch density data' });
+// // New endpoint to get density data
+// router.get('/density', (req, res) => {
+//   db.all("SELECT * FROM ingredient_density", (err, rows) => {
+//     if (err) {
+//       console.error('Error fetching density data:', err.message);
+//       res.status(500).json({ error: 'Failed to fetch density data' });
+//     } else {
+//       res.json(rows);
+//     }
+//   });
+// });
+
+
+
+// GET endpoint for searching recipes
+router.get('/search', async (req, res) => {
+  const { q: recipeName } = req.query;
+
+  if (!recipeName) {
+    return res.status(400).json({ error: 'Recipe name is required as a query parameter' });
+  }
+
+  console.log(`Received GET search request for recipe: ${recipeName}`);
+
+  try {
+    // Attempt to fetch the recipe from the database
+    const recipe = await new Promise((resolve, reject) => {
+      db.get(
+        'SELECT * FROM recipes WHERE name = ?',
+        [recipeName],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+
+    if (recipe) {
+      // If the recipe is found in the database, return it
+      const ingredients = JSON.parse(recipe.ingredients);
+      res.json({
+        ingredients,
+        totalCalories: recipe.totalCalories,
+        servings: recipe.servings,
+        caloriesPerServing: (recipe.totalCalories / recipe.servings).toFixed(1),
+      });
     } else {
-      res.json(rows);
+      // If the recipe is not found, use mock data as a fallback
+      const mockIngredients = [
+        { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
+        { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
+        { name: 'oil', quantity: '3.0', unit: 'tablespoons', calories: '360' }
+      ];
+      const mockTotalCalories = mockIngredients.reduce((sum, ing) => sum + parseFloat(ing.calories), 0).toFixed(0);
+      const mockServings = 4;
+      const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
+
+      res.status(200).json({
+        ingredients: mockIngredients,
+        totalCalories: mockTotalCalories,
+        servings: mockServings,
+        caloriesPerServing: mockCaloriesPerServing,
+        note: 'Recipe not found in database, using mock data'
+      });
     }
-  });
+  } catch (error) {
+    console.error('Error:', error.message);
+
+    // Fallback mock data in case of database errors
+    const mockIngredients = [
+      { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
+      { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
+      { name: 'oil', quantity: '3.0', unit: 'tablespoons', calories: '360' }
+    ];
+    const mockTotalCalories = mockIngredients.reduce((sum, ing) => sum + parseFloat(ing.calories), 0).toFixed(0);
+    const mockServings = 4;
+    const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
+
+    res.status(200).json({
+      ingredients: mockIngredients,
+      totalCalories: mockTotalCalories,
+      servings: mockServings,
+      caloriesPerServing: mockCaloriesPerServing,
+      note: 'Database error, using mock data'
+    });
+  }
 });
+
+
+
 
 // Close database on process exit
 process.on('SIGINT', () => {
