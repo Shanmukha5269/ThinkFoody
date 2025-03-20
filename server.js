@@ -3,6 +3,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const cors = require('cors');
 const PORT = process.env.PORT || 3030;
 
 
@@ -11,6 +12,10 @@ app.use(express.static(__dirname)); // Serve static files from root directory
 app.use('/styles', express.static(path.join(__dirname, 'styles'))); // Serve styles
 app.use('/scripts', express.static(path.join(__dirname, 'scripts'))); // Serve scripts
 app.use('/views', express.static(path.join(__dirname, 'views'))); // Serve views
+
+app.use(cors({
+  origin: ['https://think-foody.vercel.app', 'http://localhost:3030']
+}));
 
 // Serve firstpage.html at root URL
 app.get('/', (req, res) => {
