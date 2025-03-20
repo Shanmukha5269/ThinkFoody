@@ -29,7 +29,7 @@
       },
       {
         "src": "/(.*)",
-        "dest": "/views/firstPage.html"
+        "dest": "/$1"
       }
     ]
   }
