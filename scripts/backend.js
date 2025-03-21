@@ -287,9 +287,87 @@ router.post('/search', async (req, res) => {
 
 
 
+// // GET endpoint for searching recipes
+// router.get('/search', async (req, res) => {
+//   const recipeName  = req.query.recipeName;
+
+//   if (!recipeName) {
+//     return res.status(400).json({ error: 'Recipe name is required as a query parameter' });
+//   }
+
+//   console.log(`Received GET search request for recipe: ${recipeName}`);
+
+//   try {
+//     // Attempt to fetch the recipe from the database
+//     const recipe = await new Promise((resolve, reject) => {
+//       db.get(
+//         'SELECT * FROM recipes WHERE name = recipeName',
+//         [recipeName],
+//         (err, row) => {
+//           if (err) reject(err);
+//           else resolve(row);
+//         }
+//       );
+//     });
+
+//     if (recipe) {
+//       // If the recipe is found in the database, return it
+//       const ingredients = JSON.parse(recipe.ingredients);
+//       res.json({
+//         ingredients,
+//         totalCalories: recipe.totalCalories,
+//         servings: recipe.servings,
+//         caloriesPerServing: (recipe.totalCalories / recipe.servings).toFixed(1),
+//       });
+//     } else {
+//       // If the recipe is not found, use mock data as a fallback
+//       const mockIngredients = [
+//         { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
+//         { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
+//         { name: 'oil', quantity: '3.0', unit: 'tablespoons', calories: '360' }
+//       ];
+//       const mockTotalCalories = mockIngredients.reduce((sum, ing) => sum + parseFloat(ing.calories), 0).toFixed(0);
+//       const mockServings = 4;
+//       const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
+
+//       res.status(200).json({
+//         ingredients: mockIngredients,
+//         totalCalories: mockTotalCalories,
+//         servings: mockServings,
+//         caloriesPerServing: mockCaloriesPerServing,
+//         note: 'Recipe not found in database, using mock data'
+//       });
+//     }
+//   } catch (error) {
+//     console.error('Error:', error.message);
+
+//     // Fallback mock data in case of database errors
+//     const mockIngredients = [
+//       { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
+//       { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
+//       { name: 'oil', quantity: '3.0', unit: 'tablespoons', calories: '360' }
+//     ];
+//     const mockTotalCalories = mockIngredients.reduce((sum, ing) => sum + parseFloat(ing.calories), 0).toFixed(0);
+//     const mockServings = 4;
+//     const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
+
+//     res.status(200).json({
+//       ingredients: mockIngredients,
+//       totalCalories: mockTotalCalories,
+//       servings: mockServings,
+//       caloriesPerServing: mockCaloriesPerServing,
+//       note: 'Database error, using mock data'
+//     });
+//   }
+// });
+
+
+
+// new get
+
 // GET endpoint for searching recipes
 router.get('/search', async (req, res) => {
-  const { recipeName } = req.query.body;
+  const recipeName = req.query.recipeName;
 
   if (!recipeName) {
     return res.status(400).json({ error: 'Recipe name is required as a query parameter' });
@@ -298,50 +376,32 @@ router.get('/search', async (req, res) => {
   console.log(`Received GET search request for recipe: ${recipeName}`);
 
   try {
-    // Attempt to fetch the recipe from the database
-    const recipe = await new Promise((resolve, reject) => {
-      db.get(
-        'SELECT * FROM recipes WHERE name = recipeName',
-        [recipeName],
-        (err, row) => {
-          if (err) reject(err);
-          else resolve(row);
-        }
-      );
-    });
+    const prompt = `List the ingredients for a ${recipeName} recipe with quantities and units (e.g., "2 cups of flour", "1 tablespoon of oil").`;
+    const response = await axios.post(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+      { contents: [{ parts: [{ text: prompt }] }] },
+      {
+        params: { key: process.env.GEMINI_API_KEY },
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
 
-    if (recipe) {
-      // If the recipe is found in the database, return it
-      const ingredients = JSON.parse(recipe.ingredients);
-      res.json({
-        ingredients,
-        totalCalories: recipe.totalCalories,
-        servings: recipe.servings,
-        caloriesPerServing: (recipe.totalCalories / recipe.servings).toFixed(1),
-      });
-    } else {
-      // If the recipe is not found, use mock data as a fallback
-      const mockIngredients = [
-        { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
-        { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
-        { name: 'oil', quantity: '3.0', unit: 'tablespoons', calories: '360' }
-      ];
-      const mockTotalCalories = mockIngredients.reduce((sum, ing) => sum + parseFloat(ing.calories), 0).toFixed(0);
-      const mockServings = 4;
-      const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
-
-      res.status(200).json({
-        ingredients: mockIngredients,
-        totalCalories: mockTotalCalories,
-        servings: mockServings,
-        caloriesPerServing: mockCaloriesPerServing,
-        note: 'Recipe not found in database, using mock data'
-      });
+    const generatedText = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!generatedText) {
+      throw new Error('No valid content returned from API');
     }
+
+    const result = parseIngredientsFromText(generatedText);
+    if (!result) {
+      throw new Error('Could not parse ingredients from API response');
+    }
+
+    const { ingredients, totalCalories, servings, caloriesPerServing } = result;
+    res.json({ ingredients, totalCalories, servings, caloriesPerServing });
   } catch (error) {
     console.error('Error:', error.message);
 
-    // Fallback mock data in case of database errors
+    // Fallback mock data
     const mockIngredients = [
       { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
       { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
@@ -356,10 +416,11 @@ router.get('/search', async (req, res) => {
       totalCalories: mockTotalCalories,
       servings: mockServings,
       caloriesPerServing: mockCaloriesPerServing,
-      note: 'Database error, using mock data'
+      note: 'API failed, using mock data'
     });
   }
 });
+
 
 
 
