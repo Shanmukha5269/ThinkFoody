@@ -289,7 +289,7 @@ router.post('/search', async (req, res) => {
 
 // GET endpoint for searching recipes
 router.get('/search', async (req, res) => {
-  const { q: recipeName } = req.query;
+  const { recipeName } = req.query.body;
 
   if (!recipeName) {
     return res.status(400).json({ error: 'Recipe name is required as a query parameter' });
@@ -301,7 +301,7 @@ router.get('/search', async (req, res) => {
     // Attempt to fetch the recipe from the database
     const recipe = await new Promise((resolve, reject) => {
       db.get(
-        'SELECT * FROM recipes WHERE name = ?',
+        'SELECT * FROM recipes WHERE name = recipeName',
         [recipeName],
         (err, row) => {
           if (err) reject(err);

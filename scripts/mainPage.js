@@ -102,7 +102,7 @@ function searchRecipe() {
         console.error('POST attempt failed:', error);
         
         // Second attempt: GET request to /api/search
-        fetch(`/api/search?q=${encodeURIComponent(searchValue)}`, {
+        fetch(`/api/search?recipeName=${encodeURIComponent(searchValue)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
