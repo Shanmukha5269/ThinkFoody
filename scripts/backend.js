@@ -285,7 +285,7 @@ router.get('/search', async (req, res) => {
       // Fetch from Gemini API if not found in database
       const prompt = `List the ingredients for a ${recipeName} recipe with quantities and units (e.g., "2 cups of flour", "1 tablespoon of oil").`;
       const response = await axios.post(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
         { contents: [{ parts: [{ text: prompt }] }] },
         {
           params: { key: process.env.GEMINI_API_KEY },
