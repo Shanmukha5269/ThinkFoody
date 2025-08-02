@@ -1,91 +1,90 @@
-
 const express = require('express');
 const dotenv = require('dotenv');
 const axios = require('axios');
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const mysql = require('mysql2/promise'); // Use mysql2 for promise support
 const router = express.Router();
 
 // Load environment variables from .env file
 dotenv.config();
 
-// Initialize SQLite database
-const db = new sqlite3.Database(path.join(__dirname, '..', 'recipes.db'), (err) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Connected to SQLite database.');
-  }
-});
-
-// Set up database schema and populate density data
-db.serialize(() => {
-  // Create recipes table if it doesn't exist
-  db.run(`
-    CREATE TABLE IF NOT EXISTS recipes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT UNIQUE,
-      ingredients TEXT,
-      totalCalories REAL,
-      servings INTEGER
-    )
-  `);
-
-  // Create ingredient_density table if it doesn't exist
-  db.run(`
-    CREATE TABLE IF NOT EXISTS ingredient_density (
-      ingredient TEXT PRIMARY KEY,
-      cup REAL,
-      tablespoon REAL,
-      teaspoon REAL,
-      gram_per_ml REAL
-    )
-  `);
-
-  // Sample density data for common ingredients (grams per unit)
-  const densityData = [
-    { ingredient: 'flour', cup: 125, tablespoon: 8, teaspoon: 2.5, gram_per_ml: 0.5 },
-    { ingredient: 'sugar', cup: 200, tablespoon: 12.5, teaspoon: 4, gram_per_ml: 0.8 },
-    { ingredient: 'butter', cup: 227, tablespoon: 14, teaspoon: 4.7, gram_per_ml: 0.9 },
-    { ingredient: 'milk', cup: 240, tablespoon: 15, teaspoon: 5, gram_per_ml: 1.0 },
-    { ingredient: 'rice', cup: 185, tablespoon: 11.5, teaspoon: 3.8, gram_per_ml: 0.7 },
-    { ingredient: 'oil', cup: 224, tablespoon: 14, teaspoon: 4.7, gram_per_ml: 0.9 },
-    { ingredient: 'salt', cup: 288, tablespoon: 18, teaspoon: 6, gram_per_ml: 1.2 },
-    { ingredient: 'chocolate', cup: 170, tablespoon: 10.6, teaspoon: 3.5, gram_per_ml: 0.6 },
-    { ingredient: 'honey', cup: 340, tablespoon: 21, teaspoon: 7, gram_per_ml: 1.4 },
-    { ingredient: 'water', cup: 240, tablespoon: 15, teaspoon: 5, gram_per_ml: 1.0 }
-  ];
-
-  // Insert density data into the table
-  densityData.forEach(data => {
-    db.run(
-      `INSERT OR IGNORE INTO ingredient_density (ingredient, cup, tablespoon, teaspoon, gram_per_ml) VALUES (?, ?, ?, ?, ?)`,
-      [data.ingredient, data.cup, data.tablespoon, data.teaspoon, data.gram_per_ml],
-      (err) => {
-        if (err) console.error('Error inserting density data:', err.message);
-      }
-    );
+// Initialize MySQL connection pool
+async function createConnection() {
+  return mysql.createPool({
+    host: process.env.MYSQL_HOST || 'localhost',
+    user: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || '',
+    database: process.env.MYSQL_DATABASE || 'thinkfoody',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
   });
+}
 
-  // Add missing columns to recipes table if necessary
-  db.all("PRAGMA table_info(recipes)", (err, columns) => {
-    if (err) {
-      console.error('Error checking table schema:', err.message);
-      return;
+// Initialize database connection
+let pool;
+(async () => {
+  try {
+    pool = await createConnection();
+    console.log('Connected to MySQL database.');
+
+    // Create recipes table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS recipes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) UNIQUE,
+        ingredients TEXT,
+        totalCalories DECIMAL(10,2),
+        servings INT
+      )
+    `);
+
+    // Create ingredient_density table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ingredient_density (
+        ingredient VARCHAR(255) PRIMARY KEY,
+        cup DECIMAL(10,2),
+        tablespoon DECIMAL(10,2),
+        teaspoon DECIMAL(10,2),
+        gram_per_ml DECIMAL(10,2)
+      )
+    `);
+
+    // Sample density data for common ingredients (grams per unit)
+    const densityData = [
+      { ingredient: 'flour', cup: 125, tablespoon: 8, teaspoon: 2.5, gram_per_ml: 0.5 },
+      { ingredient: 'sugar', cup: 200, tablespoon: 12.5, teaspoon: 4, gram_per_ml: 0.8 },
+      { ingredient: 'butter', cup: 227, tablespoon: 14, teaspoon: 4.7, gram_per_ml: 0.9 },
+      { ingredient: 'milk', cup: 240, tablespoon: 15, teaspoon: 5, gram_per_ml: 1.0 },
+      { ingredient: 'rice', cup: 185, tablespoon: 11.5, teaspoon: 3.8, gram_per_ml: 0.7 },
+      { ingredient: 'oil', cup: 224, tablespoon: 14, teaspoon: 4.7, gram_per_ml: 0.9 },
+      { ingredient: 'salt', cup: 288, tablespoon: 18, teaspoon: 6, gram_per_ml: 1.2 },
+      { ingredient: 'chocolate', cup: 170, tablespoon: 10.6, teaspoon: 3.5, gram_per_ml: 0.6 },
+      { ingredient: 'honey', cup: 340, tablespoon: 21, teaspoon: 7, gram_per_ml: 1.4 },
+      { ingredient: 'water', cup: 240, tablespoon: 15, teaspoon: 5, gram_per_ml: 1.0 }
+    ];
+
+    // Insert density data into the table
+    for (const data of densityData) {
+      await pool.query(
+        `INSERT IGNORE INTO ingredient_density (ingredient, cup, tablespoon, teaspoon, gram_per_ml) VALUES (?, ?, ?, ?, ?)`,
+        [data.ingredient, data.cup, data.tablespoon, data.teaspoon, data.gram_per_ml]
+      );
     }
-    const columnNames = columns.map(col => col.name);
+    console.log('Density data inserted.');
+
+    // Add missing columns to recipes table if necessary
+    const [columns] = await pool.query("SHOW COLUMNS FROM recipes");
+    const columnNames = columns.map(col => col.Field);
     if (!columnNames.includes('totalCalories')) {
-      db.run("ALTER TABLE recipes ADD COLUMN totalCalories REAL", (err) => {
-        if (err) console.error('Error adding totalCalories column:', err.message);
-      });
+      await pool.query("ALTER TABLE recipes ADD COLUMN totalCalories DECIMAL(10,2)");
     }
     if (!columnNames.includes('servings')) {
-      db.run("ALTER TABLE recipes ADD COLUMN servings INTEGER DEFAULT 4", (err) => {
-        if (err) console.error('Error adding servings column:', err.message);
-      });
+      await pool.query("ALTER TABLE recipes ADD COLUMN servings INT DEFAULT 4");
     }
-  });
-});
+  } catch (err) {
+    console.error('Error setting up database:', err.message);
+  }
+})();
 
 // Conversion factors to grams (approximate, for non-liquids)
 const conversionFactors = {
@@ -193,7 +192,7 @@ const parseIngredientsFromText = (text) => {
   } : null;
 };
 
-// Search endpoint for recipes
+// Search endpoint for recipes (POST)
 router.post('/search', async (req, res) => {
   const { recipeName } = req.body;
 
@@ -206,7 +205,7 @@ router.post('/search', async (req, res) => {
   try {
     const prompt = `List the ingredients for a ${recipeName} recipe with quantities and units (e.g., "2 cups of flour", "1 tablespoon of oil").`;
     const response = await axios.post(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
       { contents: [{ parts: [{ text: prompt }] }] },
       {
         params: { key: process.env.GEMINI_API_KEY },
@@ -227,16 +226,10 @@ router.post('/search', async (req, res) => {
     const { ingredients, totalCalories, servings, caloriesPerServing } = result;
     const ingredientsJson = JSON.stringify(ingredients);
 
-    await new Promise((resolve, reject) => {
-      db.run(
-        'INSERT OR REPLACE INTO recipes (name, ingredients, totalCalories, servings) VALUES (?, ?, ?, ?)',
-        [recipeName, ingredientsJson, totalCalories, servings],
-        (err) => {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
+    await pool.query(
+      'INSERT INTO recipes (name, ingredients, totalCalories, servings) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE ingredients = ?, totalCalories = ?, servings = ?',
+      [recipeName, ingredientsJson, totalCalories, servings, ingredientsJson, totalCalories, servings]
+    );
 
     res.json({ ingredients, totalCalories, servings, caloriesPerServing });
   } catch (error) {
@@ -252,16 +245,10 @@ router.post('/search', async (req, res) => {
     const mockServings = 4;
     const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
 
-    await new Promise((resolve, reject) => {
-      db.run(
-        'INSERT OR IGNORE INTO recipes (name, ingredients, totalCalories, servings) VALUES (?, ?, ?, ?)',
-        [recipeName, JSON.stringify(mockIngredients), mockTotalCalories, mockServings],
-        (err) => {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
+    await pool.query(
+      'INSERT INTO recipes (name, ingredients, totalCalories, servings) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE ingredients = ?, totalCalories = ?, servings = ?',
+      [recipeName, JSON.stringify(mockIngredients), mockTotalCalories, mockServings, JSON.stringify(mockIngredients), mockTotalCalories, mockServings]
+    );
 
     res.status(200).json({
       ingredients: mockIngredients,
@@ -272,98 +259,6 @@ router.post('/search', async (req, res) => {
     });
   }
 });
-
-// // New endpoint to get density data
-// router.get('/density', (req, res) => {
-//   db.all("SELECT * FROM ingredient_density", (err, rows) => {
-//     if (err) {
-//       console.error('Error fetching density data:', err.message);
-//       res.status(500).json({ error: 'Failed to fetch density data' });
-//     } else {
-//       res.json(rows);
-//     }
-//   });
-// });
-
-
-
-// // GET endpoint for searching recipes
-// router.get('/search', async (req, res) => {
-//   const recipeName  = req.query.recipeName;
-
-//   if (!recipeName) {
-//     return res.status(400).json({ error: 'Recipe name is required as a query parameter' });
-//   }
-
-//   console.log(`Received GET search request for recipe: ${recipeName}`);
-
-//   try {
-//     // Attempt to fetch the recipe from the database
-//     const recipe = await new Promise((resolve, reject) => {
-//       db.get(
-//         'SELECT * FROM recipes WHERE name = recipeName',
-//         [recipeName],
-//         (err, row) => {
-//           if (err) reject(err);
-//           else resolve(row);
-//         }
-//       );
-//     });
-
-//     if (recipe) {
-//       // If the recipe is found in the database, return it
-//       const ingredients = JSON.parse(recipe.ingredients);
-//       res.json({
-//         ingredients,
-//         totalCalories: recipe.totalCalories,
-//         servings: recipe.servings,
-//         caloriesPerServing: (recipe.totalCalories / recipe.servings).toFixed(1),
-//       });
-//     } else {
-//       // If the recipe is not found, use mock data as a fallback
-//       const mockIngredients = [
-//         { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
-//         { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
-//         { name: 'oil', quantity: '3.0', unit: 'tablespoons', calories: '360' }
-//       ];
-//       const mockTotalCalories = mockIngredients.reduce((sum, ing) => sum + parseFloat(ing.calories), 0).toFixed(0);
-//       const mockServings = 4;
-//       const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
-
-//       res.status(200).json({
-//         ingredients: mockIngredients,
-//         totalCalories: mockTotalCalories,
-//         servings: mockServings,
-//         caloriesPerServing: mockCaloriesPerServing,
-//         note: 'Recipe not found in database, using mock data'
-//       });
-//     }
-//   } catch (error) {
-//     console.error('Error:', error.message);
-
-//     // Fallback mock data in case of database errors
-//     const mockIngredients = [
-//       { name: 'flour', quantity: '480.0', unit: 'grams', calories: '1747' },
-//       { name: 'cheese', quantity: '240.0', unit: 'grams', calories: '967' },
-//       { name: 'oil', quantity: '3.0', unit: 'tablespoons', calories: '360' }
-//     ];
-//     const mockTotalCalories = mockIngredients.reduce((sum, ing) => sum + parseFloat(ing.calories), 0).toFixed(0);
-//     const mockServings = 4;
-//     const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
-
-//     res.status(200).json({
-//       ingredients: mockIngredients,
-//       totalCalories: mockTotalCalories,
-//       servings: mockServings,
-//       caloriesPerServing: mockCaloriesPerServing,
-//       note: 'Database error, using mock data'
-//     });
-//   }
-// });
-
-
-
-// new get
 
 // GET endpoint for searching recipes
 router.get('/search', async (req, res) => {
@@ -376,28 +271,48 @@ router.get('/search', async (req, res) => {
   console.log(`Received GET search request for recipe: ${recipeName}`);
 
   try {
-    const prompt = `List the ingredients for a ${recipeName} recipe with quantities and units (e.g., "2 cups of flour", "1 tablespoon of oil").`;
-    const response = await axios.post(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
-      { contents: [{ parts: [{ text: prompt }] }] },
-      {
-        params: { key: process.env.GEMINI_API_KEY },
-        headers: { 'Content-Type': 'application/json' },
+    const [rows] = await pool.query('SELECT * FROM recipes WHERE name = ?', [recipeName]);
+    if (rows.length > 0) {
+      const recipe = rows[0];
+      const ingredients = JSON.parse(recipe.ingredients);
+      res.json({
+        ingredients,
+        totalCalories: recipe.totalCalories,
+        servings: recipe.servings,
+        caloriesPerServing: (recipe.totalCalories / recipe.servings).toFixed(1)
+      });
+    } else {
+      // Fetch from Gemini API if not found in database
+      const prompt = `List the ingredients for a ${recipeName} recipe with quantities and units (e.g., "2 cups of flour", "1 tablespoon of oil").`;
+      const response = await axios.post(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+        { contents: [{ parts: [{ text: prompt }] }] },
+        {
+          params: { key: process.env.GEMINI_API_KEY },
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      const generatedText = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!generatedText) {
+        throw new Error('No valid content returned from API');
       }
-    );
 
-    const generatedText = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!generatedText) {
-      throw new Error('No valid content returned from API');
+      const result = parseIngredientsFromText(generatedText);
+      if (!result) {
+        throw new Error('Could not parse ingredients from API response');
+      }
+
+      const { ingredients, totalCalories, servings, caloriesPerServing } = result;
+      const ingredientsJson = JSON.stringify(ingredients);
+
+      await pool.query(
+        'INSERT INTO recipes (name, ingredients, totalCalories, servings) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE ingredients = ?, totalCalories = ?, servings = ?',
+        [recipeName, ingredientsJson, totalCalories, servings, ingredientsJson, totalCalories, servings]
+      );
+
+      res.json({ ingredients, totalCalories, servings, caloriesPerServing });
     }
-
-    const result = parseIngredientsFromText(generatedText);
-    if (!result) {
-      throw new Error('Could not parse ingredients from API response');
-    }
-
-    const { ingredients, totalCalories, servings, caloriesPerServing } = result;
-    res.json({ ingredients, totalCalories, servings, caloriesPerServing });
   } catch (error) {
     console.error('Error:', error.message);
 
@@ -411,27 +326,42 @@ router.get('/search', async (req, res) => {
     const mockServings = 4;
     const mockCaloriesPerServing = (mockTotalCalories / mockServings).toFixed(1);
 
+    await pool.query(
+      'INSERT INTO recipes (name, ingredients, totalCalories, servings) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE ingredients = ?, totalCalories = ?, servings = ?',
+      [recipeName, JSON.stringify(mockIngredients), mockTotalCalories, mockServings, JSON.stringify(mockIngredients), mockTotalCalories, mockServings]
+    );
+
     res.status(200).json({
       ingredients: mockIngredients,
       totalCalories: mockTotalCalories,
       servings: mockServings,
       caloriesPerServing: mockCaloriesPerServing,
-      note: 'API failed, using mock data'
+      note: 'API or database failed, using mock data'
     });
   }
 });
 
+// New endpoint to get density data
+router.get('/density', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM ingredient_density');
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching density data:', err.message);
+    res.status(500).json({ error: 'Failed to fetch density data' });
+  }
+});
 
-
-
-
-// Close database on process exit
-process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) console.error('Error closing database:', err.message);
+// Close database connection on process exit
+process.on('SIGINT', async () => {
+  try {
+    await pool.end();
     console.log('Database connection closed.');
     process.exit(0);
-  });
+  } catch (err) {
+    console.error('Error closing database:', err.message);
+    process.exit(1);
+  }
 });
 
 module.exports = router;
