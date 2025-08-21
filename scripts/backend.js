@@ -82,7 +82,7 @@ let pool;
       await pool.query("ALTER TABLE recipes ADD COLUMN servings INT DEFAULT 4");
     }
   } catch (err) {
-    console.error('Error setting up database:', err.message);
+    console.error('Error setting up database:', err);
   }
 })();
 
