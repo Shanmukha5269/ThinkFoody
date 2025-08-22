@@ -67,7 +67,7 @@ A beautiful recipe website with animated landing page using HTML, CSS, and Node.
         -  docker run --name foody image-name   
      - And now change directory to public
        - Build the image
-       - Contanarise it and run in the port -p host_port:80 .
+       - Contanarise it and run in the port -p host_port:80 and even mount to the same network as mounted for foody and mysql containers.
        - Now when http://localhost:host_port is accessed we could see our webpage .
        - So by this the reverse proxy is established successfully .
        - Now the requests are sent to host_port instead of directly sending into port 3030 where the application is actually running as per the code .
