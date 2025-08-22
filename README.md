@@ -58,6 +58,16 @@ A beautiful recipe website with animated landing page using HTML, CSS, and Node.
         Connected to MySQL database.
         Density data inserted 
 
- - Now you can access the website at http://localhost:3030
+ - Using Nginx as a Reverse Proxy
+   - Reverse proxy means instead of directly sending the requests to the application it is send through nginx by which the dos attacks can be controlled.
+   - Using nginx as reverse proxy it identifies the multiple requests from the same user and stops the particular user for few a time using the website.
+   - To use it
+     - Run both mysql container and application container , note that the application container is *not mounted* to any port such as -p 3030:3030 .
+     - And now change directory to public
+       - Build the image
+       - Contanarise it and run in the port -p host_port:80 .
+       - Now when http://localhost:host_port is accessed we could see our webpage .
+       - So by this the reverse proxy is established successfully .
+       - Now the requests are sent to host_port instead of directly sending into port 3030 where the application is actually running as per the code .
+      
 
-To view the website click : [ThinkFoody](https://think-foody-56ry.vercel.app/)
