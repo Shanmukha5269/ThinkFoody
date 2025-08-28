@@ -53,11 +53,13 @@ Which is contanarised using nginx as reverse proxy.
  - Using Nginx as a Reverse Proxy
    - Reverse proxy means instead of directly sending the requests to the application it is send through nginx by which the dos attacks can be controlled.
    - Using nginx as reverse proxy it identifies the multiple requests from the same user and stops the particular user for few a time using the website.
+   - To use
+     -  Run both mysql container and application container , note that the application container specifying the name as foody (make sure you given the same name to the container) is *not mounted* to any port such as -p 3030:3030 .
    - To use it
      - Run both mysql container and application container , note that the application container specifying the name as foody (make sure you given the same name to the container) is *not mounted* to any port such as -p 3030:3030 .
      - Note: run the ngnix image in port 80 itself ( -p 80:80 ) 
      -  That is use the command
-        -  docker run --name foody image-name
+        -  docker run --name foody image-name   
      - And now change directory to public
        - Build the image
        - Contanarise it and run in the port -p host_port:80 and even mount to the same network as mounted for foody and mysql containers.

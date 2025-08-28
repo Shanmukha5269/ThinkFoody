@@ -1,0 +1,42 @@
+services:
+  mysql:
+    image: mysql
+    container_name: mysql-com
+    networks:
+      - foody-network
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+
+  foody:
+    build: 
+      context: .
+    container_name: foody-com
+    networks: 
+      - foody-network
+    ports: 
+      - "3030:3030"
+    depends_on:
+      - mysql
+    command: ["./wait-for-mysql.sh", "mysql:3306", "--", "npm", "start"]
+
+#  nginx-container:
+#    image: nginx
+#    build:
+#      context: .
+#    container_name: nginx-container-com
+#    networks:
+#      - foody-network
+#    ports:
+#      - "80:80"
+
+networks:
+  foody-network:
+    driver: bridge
+
