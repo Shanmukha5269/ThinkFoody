@@ -67,4 +67,11 @@ Which is contanarised using nginx as reverse proxy.
        - So by this the reverse proxy is established successfully .
        - Now the requests are sent to host_port instead of directly sending into port 3030 where the application is actually running as per the code .
       
-
+ - Using docker compose command :
+    - yaml file is present in the repo.
+    - just use the command 
+        - docker compose up
+    - By this it starts building everything required and starts the container by itself
+    - Wait for sql is a bash script written to make the application container to wait untill the mysql connection is established.
+    - Soon after establishing the connection it again waits for some more time to make sure mysql is connected.
+    - By now you could access the application in port 3030
